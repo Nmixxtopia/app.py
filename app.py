@@ -2,41 +2,7 @@ import streamlit as st
 import random
 import time
 
-# 1. 페이지 설정 및 배경 꾸미기 (CSS)
-st.set_page_config(page_title="NMIXX FACT 30 퀴즈", page_icon="⭐")
-
-def add_bg():
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }}
-        /* 텍스트 입력창과 버튼 색상 조정 */
-        .stTextInput label, .stMarkdown p {{
-            color: white !important;
-        }}
-        .stButton>button {{
-            background-color: #ffffff;
-            color: #764ba2;
-            border-radius: 20px;
-            font-weight: bold;
-        }}
-        /* 퀴즈 박스 배경 */
-        div[data-testid="stForm"] {{
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-add_bg()
-
-# --- 퀴즈 데이터 (이전과 동일) ---
+# 팩트 기반 30문제 데이터 (규진 문제 수정 완료)
 quiz_data = [
     {"q": "엔믹스의 데뷔일은 2022년 2월 몇 일일까요? (숫자만)", "a": "22"},
     {"q": "멤버 설윤이 연습생 시절 합격했던 '3대 기획사'는 SM, YG, 그리고 어디일까요?", "a": "JYP"},
@@ -46,7 +12,7 @@ quiz_data = [
     {"q": "엔믹스의 첫 번째 미니 앨범 이름은?", "a": "expergo"},
     {"q": "곡 'O.O'에서 가사 중 'Baile, Baile, Baile'의 뜻은 스페인어로 무엇일까요?", "a": "춤춰"},
     {"q": "멤버 지우의 혈액형은 무엇일까요? (대문자로)", "a": "AB"},
-    {"q": "엔믹스 멤버 전원이 보컬, 댄스, 비주얼이 다 된다는 의미의 수식어는?", "a": "올라운더"},
+    {"q": "엔믹스 멤버 전원이 보컬, 댄스, 비주얼이 다 된다는 의미의 수식어는?", "a": "전원올라운더"},
     {"q": "곡 'DASH'가 수록된 미니 2집 앨범의 타이틀은?", "a": "Fe3O4: BREAK"},
     {"q": "멤버 릴리의 국적은 한국과 어디일까요?", "a": "호주"},
     {"q": "곡 'Young, Dumb, Stupid'에 샘플링된 프랑스 유명 동요의 제목은?", "a": "Frere Jacques"},
@@ -70,6 +36,8 @@ quiz_data = [
     {"q": "엔믹스의 인사법에서 '둘, 셋' 다음에 외치는 문구는?", "a": "안녕하세요 엔믹스입니다"}
 ]
 
+st.set_page_config(page_title="NMIXX FACT 30 퀴즈", page_icon="⭐")
+
 # 세션 상태 초기화
 if 'shuffled_quiz' not in st.session_state:
     temp_list = quiz_data.copy()
@@ -84,6 +52,7 @@ st.write(f"현재 점수: **{st.session_state.score}** / 30")
 
 if st.session_state.q_idx < len(st.session_state.shuffled_quiz):
     current_q = st.session_state.shuffled_quiz[st.session_state.q_idx]
+    
     st.progress((st.session_state.q_idx + 1) / 30)
     st.info(f"**문제 {st.session_state.q_idx + 1}:** {current_q['q']}")
     
@@ -100,7 +69,9 @@ if st.session_state.q_idx < len(st.session_state.shuffled_quiz):
                 msg_placeholder.success(f"🎉 정답입니다! 정답은 '{current_q['a']}'였습니다!")
                 st.balloons()
                 st.snow()
+                
                 time.sleep(2)
+                
                 st.session_state.score += 1
                 st.session_state.q_idx += 1
                 st.session_state.input_key += 1
@@ -109,7 +80,7 @@ if st.session_state.q_idx < len(st.session_state.shuffled_quiz):
                 st.error("❌ 틀렸습니다! 다시 한 번 생각해보세요.")
 else:
     st.balloons()
-    st.success("🎊 모든 문제를 완료했습니다!")
+    st.success("🎊 모든 문제를 완료했습니다! 당신은 진정한 마스터 NSWER!")
     st.header(f"최종 결과: {st.session_state.score}점 / 30점")
     if st.button("다시 도전하기"):
         del st.session_state.shuffled_quiz
