@@ -2,7 +2,41 @@ import streamlit as st
 import random
 import time
 
-# 팩트 기반 30문제 데이터 (규진 문제 수정 완료)
+# 1. 페이지 설정 및 배경 꾸미기 (CSS)
+st.set_page_config(page_title="NMIXX FACT 30 퀴즈", page_icon="⭐")
+
+def add_bg():
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }}
+        /* 텍스트 입력창과 버튼 색상 조정 */
+        .stTextInput label, .stMarkdown p {{
+            color: white !important;
+        }}
+        .stButton>button {{
+            background-color: #ffffff;
+            color: #764ba2;
+            border-radius: 20px;
+            font-weight: bold;
+        }}
+        /* 퀴즈 박스 배경 */
+        div[data-testid="stForm"] {{
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+add_bg()
+
+# --- 퀴즈 데이터 (이전과 동일) ---
 quiz_data = [
     {"q": "엔믹스의 데뷔일은 2022년 2월 몇 일일까요? (숫자만)", "a": "22"},
     {"q": "멤버 설윤이 연습생 시절 합격했던 '3대 기획사'는 SM, YG, 그리고 어디일까요?", "a": "JYP"},
@@ -36,8 +70,6 @@ quiz_data = [
     {"q": "엔믹스의 인사법에서 '둘, 셋' 다음에 외치는 문구는?", "a": "안녕하세요 엔믹스입니다"}
 ]
 
-st.set_page_config(page_title="NMIXX FACT 30 퀴즈", page_icon="⭐")
-
 # 세션 상태 초기화
 if 'shuffled_quiz' not in st.session_state:
     temp_list = quiz_data.copy()
@@ -52,7 +84,6 @@ st.write(f"현재 점수: **{st.session_state.score}** / 30")
 
 if st.session_state.q_idx < len(st.session_state.shuffled_quiz):
     current_q = st.session_state.shuffled_quiz[st.session_state.q_idx]
-    
     st.progress((st.session_state.q_idx + 1) / 30)
     st.info(f"**문제 {st.session_state.q_idx + 1}:** {current_q['q']}")
     
@@ -69,9 +100,7 @@ if st.session_state.q_idx < len(st.session_state.shuffled_quiz):
                 msg_placeholder.success(f"🎉 정답입니다! 정답은 '{current_q['a']}'였습니다!")
                 st.balloons()
                 st.snow()
-                
                 time.sleep(2)
-                
                 st.session_state.score += 1
                 st.session_state.q_idx += 1
                 st.session_state.input_key += 1
@@ -80,7 +109,7 @@ if st.session_state.q_idx < len(st.session_state.shuffled_quiz):
                 st.error("❌ 틀렸습니다! 다시 한 번 생각해보세요.")
 else:
     st.balloons()
-    st.success("🎊 모든 문제를 완료했습니다! 당신은 진정한 마스터 NSWER!")
+    st.success("🎊 모든 문제를 완료했습니다!")
     st.header(f"최종 결과: {st.session_state.score}점 / 30점")
     if st.button("다시 도전하기"):
         del st.session_state.shuffled_quiz
