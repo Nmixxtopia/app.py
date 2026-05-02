@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+from streamlit_confetti import confetti  # 폭죽 라이브러리 추가
 
 # 고난도 30문제 데이터
 quiz_data = [
@@ -35,7 +36,7 @@ quiz_data = [
     {"q": "엔믹스의 인사법 '둘 셋! 안녕하세요 0000입니다!' 빈칸은?", "a": "엔믹스"}
 ]
 
-st.set_page_config(page_title="NMIXX 고난도 30문 퀴즈", page_icon="💃")
+st.set_page_config(page_title="NMIXX 고난도 30문 퀴즈", page_icon="🎤")
 
 # 세션 상태 초기화
 if 'q_idx' not in st.session_state:
@@ -43,34 +44,41 @@ if 'q_idx' not in st.session_state:
     st.session_state.q_idx = 0
     st.session_state.score = 0
     st.session_state.input_key = 0
+    st.session_state.correct_anim = False # 정답 애니메이션 상태
 
 # 현재 문제 가져오기
 if st.session_state.q_idx < len(quiz_data):
     current_q = quiz_data[st.session_state.q_idx]
 
-    st.title("💃 NMIXX 마스터 챌린지 (30문)")
+    st.title("🎤 NMIXX 마스터 챌린지 (30문)")
     st.write(f"**진행 상황:** {st.session_state.q_idx + 1} / 30 | **현재 점수:** {st.session_state.score}")
     st.progress((st.session_state.q_idx + 1) / 30)
 
     st.subheader(f"Q. {current_q['q']}")
     
+    # 정답 맞췄을 때 폭죽 팡팡!
+    if st.session_state.correct_anim:
+        confetti(content_count=200, explosion_speed=2) # 폭죽 효과!
+        st.success(f"🎉 정답입니다! : {current_q['a']}")
+        st.session_state.correct_anim = False # 상태 초기화
+
     # 폼을 사용하여 정답 제출 후 입력창 자동 초기화
     with st.form(key=f"quiz_form_{st.session_state.input_key}"):
         user_answer = st.text_input("정답을 입력하세요:", key="user_input").strip()
         submit_button = st.form_submit_button(label="제출하기")
 
         if submit_button:
+            # 띄어쓰기/대소문자 무시 체크
             if user_answer.replace(" ", "").lower() == current_q['a'].replace(" ", "").lower():
-                st.balloons()
-                st.success(f"🎉 정답입니다! : {current_q['a']}")
                 st.session_state.score += 1
                 st.session_state.q_idx += 1
-                st.session_state.input_key += 1 # 폼 키를 바꿔서 입력창을 강제 초기화
+                st.session_state.input_key += 1
+                st.session_state.correct_anim = True # 폭죽 애니메이션 켜기
                 st.rerun()
             else:
                 st.error("❌ 틀렸습니다! 다시 한 번 생각해보세요.")
 else:
-    st.balloons()
+    confetti(content_count=500, explosion_speed=1) # 최종 클리어 폭죽!
     st.title("🏆 축하합니다! 모든 문제를 풀었습니다!")
     st.header(f"최종 점수: {st.session_state.score} / 30")
     if st.button("다시 시작하기"):
